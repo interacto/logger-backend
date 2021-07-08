@@ -7,9 +7,10 @@ const path = './logs/';
 
 @Injectable()
 export class ApiService {
-  saveUsageData(usageDto: UsageDto) {
+  async saveUsageData(usageDto: UsageDto) {
     console.log('Received usage data: ' + usageDto.id + ' at ' + usageDto.date);
-    const data = JSON.stringify(usageDto);
+    await fs.promises.mkdir(path, { recursive: true }); // Create logs directory if needed
+    const data = JSON.stringify(usageDto, null, 4);
     fs.writeFile(path + 'usage.json', data, (err) => {
       if (err) {
         // If an error occurred while writing the file
@@ -18,11 +19,12 @@ export class ApiService {
     });
   }
 
-  saveErrorData(errorDto: ErrorDto) {
+  async saveErrorData(errorDto: ErrorDto) {
     console.log(
       'Received error data: ' + errorDto.msg + ' at ' + errorDto.date,
     );
-    const data = JSON.stringify(errorDto);
+    await fs.promises.mkdir(path, { recursive: true }); // Create logs directory if needed
+    const data = JSON.stringify(errorDto, null, 4);
     fs.writeFile(path + 'error.json', data, (err) => {
       if (err) {
         // If an error occurred while writing the file

@@ -3,7 +3,6 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { ApiModule } from '../src/api/api.module';
 import { UsageDto } from '../src/api/dto/usage.dto';
-import { ApiService } from '../src/api/api.service';
 import { ErrorDto } from '../src/api/dto/error.dto';
 
 describe('Api (e2e)', () => {

@@ -14,11 +14,11 @@ export class ApiController {
 
   @Post('usage')
   usage(@Body() usageDto: UsageDto) {
-    this.apiService.saveUsageData(usageDto);
+    this.apiService.saveUsageData(usageDto).then();
   }
 
   @Post('err')
   error(@Body() errorDto: ErrorDto) {
-    this.apiService.saveErrorData(errorDto);
+    this.apiService.saveErrorData(errorDto).then();
   }
 }
