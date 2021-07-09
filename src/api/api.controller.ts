@@ -13,12 +13,12 @@ export class ApiController {
   }
 
   @Post('usage')
-  usage(@Body() usageDto: UsageDto) {
-    this.apiService.saveUsageData(usageDto).then();
+  async usage(@Body() usageDto: UsageDto) {
+    await this.apiService.saveUsageData(usageDto);
   }
 
   @Post('err')
-  error(@Body() errorDto: ErrorDto) {
-    this.apiService.saveErrorData(errorDto).then();
+  async error(@Body() errorDto: ErrorDto) {
+    await this.apiService.saveErrorData(errorDto);
   }
 }

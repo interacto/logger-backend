@@ -3,14 +3,14 @@ import { UsageDto } from './dto/usage.dto';
 import { ErrorDto } from './dto/error.dto';
 import * as fs from 'fs';
 
-const path = './logs/';
-const usageLogsName = 'usage.json';
-const errorLogsName = 'error.json';
-
 @Injectable()
 export class ApiService {
-  private usageLogs: Array<UsageDto> = [];
-  private errorLogs: Array<ErrorDto> = [];
+  public static path = './logs/';
+  public static usageLogsName = 'usage.json';
+  public static errorLogsName = 'error.json';
+
+  public usageLogs: Array<UsageDto> = [];
+  public errorLogs: Array<ErrorDto> = [];
 
   constructor() {
     this.loadLogData();
@@ -20,14 +20,14 @@ export class ApiService {
    * Loads the logs from previous sessions.
    */
   loadLogData() {
-    fs.mkdirSync(path, { recursive: true }); // Create logs directory if needed
+    fs.mkdirSync(ApiService.path, { recursive: true }); // Create logs directory if needed
     try {
-      const data = fs.readFileSync(path + usageLogsName);
+      const data = fs.readFileSync(ApiService.path + ApiService.usageLogsName);
       this.usageLogs = JSON.parse(data.toString());
     } catch (err) {} // File did not exist, no data to load
 
     try {
-      const data = fs.readFileSync(path + errorLogsName);
+      const data = fs.readFileSync(ApiService.path + ApiService.errorLogsName);
       this.errorLogs = JSON.parse(data.toString());
     } catch (err) {} // File did not exist, no data to load
   }
@@ -40,12 +40,10 @@ export class ApiService {
     console.log('Received usage data: ' + usageDto.id + ' at ' + usageDto.date);
     this.usageLogs.push(usageDto);
     const data = JSON.stringify(this.usageLogs, null, 4);
-    fs.writeFile(path + usageLogsName, data, (err) => {
-      if (err) {
-        // If an error occurred while writing the file
-        throw err;
-      }
-    });
+    await fs.promises.writeFile(
+      ApiService.path + ApiService.usageLogsName,
+      data,
+    );
   }
 
   /**
@@ -58,11 +56,9 @@ export class ApiService {
     );
     this.errorLogs.push(errorDto);
     const data = JSON.stringify(this.errorLogs, null, 4);
-    fs.writeFile(path + errorLogsName, data, (err) => {
-      if (err) {
-        // If an error occurred while writing the file
-        throw err;
-      }
-    });
+    await fs.promises.writeFile(
+      ApiService.path + ApiService.errorLogsName,
+      data,
+    );
   }
 }
