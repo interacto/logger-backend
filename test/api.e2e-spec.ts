@@ -64,7 +64,7 @@ describe('Api (e2e)', () => {
 
   it('/api/err (POST)', async () => {
     const test = await request(app.getHttpServer())
-      .post('/api/error')
+      .post('/api/err')
       .send(errorDto)
       .expect(201);
 
@@ -84,11 +84,11 @@ describe('Api (e2e)', () => {
       .expect([usageDto]);
   });
 
-  it('/api/error (GET)', async () => {
-    await request(app.getHttpServer()).post('/api/error').send(errorDto);
+  it('/api/err (GET)', async () => {
+    await request(app.getHttpServer()).post('/api/err').send(errorDto);
 
     return request(app.getHttpServer())
-      .get('/api/error')
+      .get('/api/err')
       .expect(200)
       .expect([errorDto]);
   });

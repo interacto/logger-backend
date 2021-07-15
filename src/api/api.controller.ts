@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { LoggingData, UsageLog } from 'interacto';
 
@@ -11,7 +11,7 @@ export class ApiController {
     return this.apiService.usageLogs;
   }
 
-  @Get('error')
+  @Get('err')
   getError(): Array<LoggingData> {
     return this.apiService.errorLogs;
   }
@@ -21,8 +21,18 @@ export class ApiController {
     await this.apiService.saveUsageData(usageDto);
   }
 
-  @Post('error')
+  @Post('err')
   async error(@Body() errorDto: LoggingData) {
     await this.apiService.saveErrorData(errorDto);
+  }
+
+  @Delete('usage')
+  async deleteUsage() {
+    await this.apiService.deleteUsageData();
+  }
+
+  @Delete('err')
+  async deleteError() {
+    await this.apiService.deleteErrorData();
   }
 }
