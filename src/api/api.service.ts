@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { UsageDto } from './dto/usage.dto';
-import { ErrorDto } from './dto/error.dto';
 import * as fs from 'fs';
+import { LoggingData, UsageLog } from 'interacto';
 
 @Injectable()
 export class ApiService {
@@ -9,8 +8,8 @@ export class ApiService {
   public static usageLogsName = 'usage.json';
   public static errorLogsName = 'error.json';
 
-  public usageLogs: Array<UsageDto> = [];
-  public errorLogs: Array<ErrorDto> = [];
+  public usageLogs: Array<UsageLog> = [];
+  public errorLogs: Array<LoggingData> = [];
 
   constructor() {
     this.loadLogData();
@@ -36,8 +35,10 @@ export class ApiService {
    * Saves the provided usage data to the usage log file.
    * @param usageDto The data to save.
    */
-  async saveUsageData(usageDto: UsageDto) {
-    console.log('Received usage data: ' + usageDto.id + ' at ' + usageDto.date);
+  async saveUsageData(usageDto: UsageLog) {
+    console.log(
+      'Received usage data: ' + usageDto.name + ' at ' + usageDto.date,
+    );
     this.usageLogs.push(usageDto);
     const data = JSON.stringify(this.usageLogs, null, 4);
     await fs.promises.writeFile(
@@ -50,7 +51,7 @@ export class ApiService {
    * Saves the provided error data to the error log file.
    * @param errorDto The data to save.
    */
-  async saveErrorData(errorDto: ErrorDto) {
+  async saveErrorData(errorDto: LoggingData) {
     console.log(
       'Received error data: ' + errorDto.msg + ' at ' + errorDto.date,
     );

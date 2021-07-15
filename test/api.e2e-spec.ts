@@ -2,18 +2,21 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { ApiModule } from '../src/api/api.module';
-import { UsageDto } from '../src/api/dto/usage.dto';
-import { ErrorDto } from '../src/api/dto/error.dto';
 import * as fs from 'fs';
 import { ApiService } from '../src/api/api.service';
 import { rmSync } from 'fs';
+import { LoggingData, UsageLog } from 'interacto';
 
 describe('Api (e2e)', () => {
   let app: INestApplication;
-  let usageDto: UsageDto;
-  let errorDto: ErrorDto;
+  let usageDto: UsageLog;
+  let errorDto: LoggingData;
 
   beforeAll(() => {
+    rmSync(ApiService.path, { recursive: true, force: true });
+  });
+
+  afterEach(() => {
     rmSync(ApiService.path, { recursive: true, force: true });
   });
 
@@ -24,18 +27,19 @@ describe('Api (e2e)', () => {
 
     usageDto = {
       date: 2021,
-      id: 'test id',
+      name: 'test name',
       duration: 42,
-      cancel: false,
+      cancelled: false,
       sessionID: 'test session id',
       frontVersion: 'front 1.0',
     };
 
     errorDto = {
+      type: 'ERR',
       date: 2021,
       sessionID: 'test session id',
       msg: 'test msg',
-      level: 'test level',
+      level: 'interaction',
       stack: 'test stack',
       name: 'test name',
       frontVersion: 'front 1.0',
@@ -43,13 +47,6 @@ describe('Api (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-  });
-
-  it('/api/usage (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/api/usage')
-      .expect(200)
-      .expect('usage');
   });
 
   it('/api/usage (POST)', async () => {
@@ -67,7 +64,7 @@ describe('Api (e2e)', () => {
 
   it('/api/err (POST)', async () => {
     const test = await request(app.getHttpServer())
-      .post('/api/err')
+      .post('/api/error')
       .send(errorDto)
       .expect(201);
 
@@ -76,5 +73,23 @@ describe('Api (e2e)', () => {
     expect(logs).toHaveLength(1);
     expect(logs).toStrictEqual([errorDto]);
     return test;
+  });
+
+  it('/api/usage (GET)', async () => {
+    await request(app.getHttpServer()).post('/api/usage').send(usageDto);
+
+    return request(app.getHttpServer())
+      .get('/api/usage')
+      .expect(200)
+      .expect([usageDto]);
+  });
+
+  it('/api/error (GET)', async () => {
+    await request(app.getHttpServer()).post('/api/error').send(errorDto);
+
+    return request(app.getHttpServer())
+      .get('/api/error')
+      .expect(200)
+      .expect([errorDto]);
   });
 });
